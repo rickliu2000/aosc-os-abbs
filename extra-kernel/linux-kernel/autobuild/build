@@ -3,8 +3,10 @@ OLDARCH="$ARCH"
 unset ARCH
 if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then
     SRCARCH="x86"
+    MAKE_AFTER="LLVM=1 LLVM_IAS=1"
 elif [[ "${CROSS:-$ARCH}" = "arm64" ]]; then
     SRCARCH="arm64"
+    MAKE_AFTER="LLVM=1 LLVM_IAS=1"
 elif [[ "${CROSS:-$ARCH}" = "loongson3" ]]; then
     SRCARCH="mips"
 elif [[ "${CROSS:-$ARCH}" = "ppc64el" ]]; then
@@ -19,7 +21,7 @@ abinfo "Setting up variables ..."
 . "$SRCDIR"/autobuild/build-common/set-var
 
 abinfo "Building Kernel ..."
-make
+make ${MAKE_AFTER}
 
 abinfo "Stripping Kernel modules ..."
 . "$SRCDIR"/autobuild/build-common/strip-modules
@@ -27,7 +29,7 @@ abinfo "Stripping Kernel modules ..."
 abinfo "Installing Kernel modules ..."
 mkdir -pv "$PKGDIR"/usr
 make modules_install \
-    INSTALL_MOD_PATH="$PKGDIR"/usr
+    INSTALL_MOD_PATH="$PKGDIR"/usr ${MAKE_AFTER}
 
 abinfo "Installing Kernel image ..."
 if [[ "${CROSS:-$ARCH}" = "amd64" ]]; then
